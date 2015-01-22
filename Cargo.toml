@@ -1,0 +1,8 @@
+[package]
+name = "roulette"
+version = "0.0.1"
+authors = ["Nathan Stoddard <nstodda@purdue.edu>"]
+
+[lib]
+name = "roulette"
+doc = true
