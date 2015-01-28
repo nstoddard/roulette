@@ -2,6 +2,11 @@
 name = "roulette"
 version = "0.0.1"
 authors = ["Nathan Stoddard <nstodda@purdue.edu>"]
+description = "An efficient implementation of roulette wheel selection"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/nstoddard/roulette"
+# TODO: keywords?
 
 [lib]
 name = "roulette"
