@@ -1,4 +1,4 @@
-#![allow(unstable)]
+#![feature(rand, core)]
 
 //! An efficient implementation of roulette wheel selection. This can be
 //! used to simulate a loaded die.
@@ -48,7 +48,7 @@ impl<T> Roulette<T> {
     /// Panics if the probabilities are all zero or if any are negative.
     pub fn new(probabilities: Vec<(T, f64)>) -> Roulette<T> {
         let len = probabilities.len();
-        let range = distributions::Range::new(0us, len);
+        let range = distributions::Range::new(0usize, len);
 
         let sum = probabilities.iter().map(|x| x.1).sum();
         for prob in probabilities.iter() {
@@ -64,7 +64,7 @@ impl<T> Roulette<T> {
         let average = 1.0 / len as f64;
         let mut small = Vec::new();
         let mut large = Vec::new();
-        for i in iter::range(0, len) {
+        for i in 0..len {
             if prob[i] >= average {
                 large.push(i);
             } else {
