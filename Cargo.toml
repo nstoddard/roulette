@@ -11,3 +11,6 @@ repository = "https://github.com/nstoddard/roulette"
 [lib]
 name = "roulette"
 doc = true
+
+[dependencies]
+rand = "*"

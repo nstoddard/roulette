@@ -1,5 +1,3 @@
-#![feature(rand, core)]
-
 //! An efficient implementation of roulette wheel selection. This can be
 //! used to simulate a loaded die.
 //! 
@@ -25,10 +23,10 @@
 //!   }
 //! ```
 
+extern crate rand;
 
-use std::rand::Rng;
-use std::rand::distributions::{self, IndependentSample};
-use std::iter::{self, repeat, AdditiveIterator};
+use rand::Rng;
+use rand::distributions::{self, IndependentSample};
 
 
 /// An efficient implementation of roulette wheel selection. This can be
@@ -50,7 +48,13 @@ impl<T> Roulette<T> {
         let len = probabilities.len();
         let range = distributions::Range::new(0usize, len);
 
-        let sum = probabilities.iter().map(|x| x.1).sum();
+        // .sum() isn't stable right now :(
+        //let sum = probabilities.iter().map(|x| x.1).sum();
+        let mut sum = 0.0;
+        for &(_,prob) in probabilities.iter() {
+            sum += prob;
+        }
+
         for prob in probabilities.iter() {
             if prob.1 < 0.0 {
                 panic!("Invalid probability in Roulette: must not be negative");
@@ -72,8 +76,8 @@ impl<T> Roulette<T> {
             }
         }
 
-        let mut alias: Vec<_> = repeat(0).take(len).collect();
-        let mut probability: Vec<_> = repeat(0.0).take(len).collect();
+        let mut alias = vec![0; len];
+        let mut probability = vec![0.0; len];
 
         while !small.is_empty() && !large.is_empty() {
             let less = small.pop().unwrap();
