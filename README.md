@@ -19,3 +19,5 @@ for _ in range(0, 10) {
     println!("{}", rand);
 }
 ```
+
+In this example, `rand` will be 'a' with 40% probability, 'b' with 40% probability, and 'c' with 20% probability.
