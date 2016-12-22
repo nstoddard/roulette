@@ -1,25 +1,32 @@
 //! A Rust implementation of roulette wheel selection using the
 //! Alias Method. This can be used to simulate a loaded die and similar
 //! situations.
-//! 
+//!
 //! Initialization takes O(n) time; choosing a random element takes O(1) time.
 //! This is far faster than naive algorithms (the most common of which is
 //! commonly known as 'roulette wheel selection'). For an in-depth explanation
 //! of the algorithm, see http://www.keithschwarz.com/darts-dice-coins/.
-//! 
+//!
 //! This code was translated from
 //! http://www.keithschwarz.com/interesting/code/?dir=alias-method.
 //!
 //! # Example
 //!
 //! ```rust
+//! extern crate rand;
+//! extern crate roulette;
+//!
+//! use roulette::Roulette;
+//!
+//! fn main() {
 //!   let mut rng = rand::thread_rng();
 //!   let roulette = Roulette::new(vec![
 //!       ('a', 1.0), ('b', 1.0), ('c', 0.5), ('d', 0.0)]);
-//!   for _ in range(0, 10) {
+//!   for _ in 0..10 {
 //!       let rand = roulette.next(&mut rng);
 //!       println!("{}", rand);
 //!   }
+//! }
 //! ```
 
 extern crate rand;
@@ -48,9 +55,9 @@ impl<T> Roulette<T> {
         let range = distributions::Range::new(0usize, len);
 
         // .sum() isn't stable right now :(
-        //let sum = probabilities.iter().map(|x| x.1).sum();
+        // let sum = probabilities.iter().map(|x| x.1).sum();
         let mut sum = 0.0;
-        for &(_,prob) in probabilities.iter() {
+        for &(_, prob) in probabilities.iter() {
             sum += prob;
         }
 
@@ -63,7 +70,7 @@ impl<T> Roulette<T> {
 
         let inv_sum = 1.0 / sum;
         let mut prob: Vec<_> = probabilities.iter().map(|x| x.1 * inv_sum).collect();
-        
+
         let average = 1.0 / len as f64;
         let mut small = Vec::new();
         let mut large = Vec::new();
@@ -98,8 +105,12 @@ impl<T> Roulette<T> {
             probability[large.pop().unwrap()] = 1.0;
         }
 
-        Roulette {probabilities: probabilities.into_iter().map(|x| x.0).collect(),
-            alias: alias, probability: probability, range: range}
+        Roulette {
+            probabilities: probabilities.into_iter().map(|x| x.0).collect(),
+            alias: alias,
+            probability: probability,
+            range: range,
+        }
     }
 
     /// Returns a random element; each element's chance of being returned
@@ -109,6 +120,6 @@ impl<T> Roulette<T> {
     pub fn next<R: Rng>(&self, rng: &mut R) -> &T {
         let column = self.range.ind_sample(rng);
         let coin = rng.gen::<f64>() < self.probability[column];
-        &self.probabilities[if coin {column} else {self.alias[column]}]
+        &self.probabilities[if coin { column } else { self.alias[column] }]
     }
 }
