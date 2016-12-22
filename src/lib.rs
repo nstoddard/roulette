@@ -57,11 +57,11 @@ impl<T> Roulette<T> {
         // .sum() isn't stable right now :(
         // let sum = probabilities.iter().map(|x| x.1).sum();
         let mut sum = 0.0;
-        for &(_, prob) in probabilities.iter() {
+        for &(_, prob) in &probabilities {
             sum += prob;
         }
 
-        for prob in probabilities.iter() {
+        for prob in &probabilities {
             if prob.1 < 0.0 {
                 panic!("Invalid probability in Roulette: must not be negative");
             }
@@ -74,8 +74,8 @@ impl<T> Roulette<T> {
         let average = 1.0 / len as f64;
         let mut small = Vec::new();
         let mut large = Vec::new();
-        for i in 0..len {
-            if prob[i] >= average {
+        for (i, prob) in prob.iter().enumerate().take(len) {
+            if *prob >= average {
                 large.push(i);
             } else {
                 small.push(i);

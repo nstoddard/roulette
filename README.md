@@ -10,6 +10,9 @@ This code was translated from
 http://www.keithschwarz.com/interesting/code/?dir=alias-method.
 
 # Example
+
+Run example with `cargo run --example simple`
+
 ```rust
 extern crate rand;
 extern crate roulette;
