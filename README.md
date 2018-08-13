@@ -24,7 +24,7 @@ fn main() {
   let roulette = Roulette::new(vec![
       ('a', 1.0), ('b', 1.0), ('c', 0.5), ('d', 0.0)]);
   for _ in 0..10 {
-      let rand = roulette.next(&mut rng);
+      let rand = roulette.sample(&mut rng);
       println!("{}", rand);
   }
 }

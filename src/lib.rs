@@ -19,21 +19,19 @@
 //! use roulette::Roulette;
 //!
 //! fn main() {
-//!   let mut rng = rand::thread_rng();
-//!   let roulette = Roulette::new(vec![
-//!       ('a', 1.0), ('b', 1.0), ('c', 0.5), ('d', 0.0)]);
-//!   for _ in 0..10 {
-//!       let rand = roulette.next(&mut rng);
-//!       println!("{}", rand);
-//!   }
+//!     let mut rng = rand::thread_rng();
+//!     let roulette = Roulette::new(vec![('a', 1.0), ('b', 1.0), ('c', 0.5), ('d', 0.0)]);
+//!     for _ in 0..10 {
+//!         let rand = roulette.sample(&mut rng);
+//!         println!("{}", rand);
+//!     }
 //! }
 //! ```
 
 extern crate rand;
 
+use rand::distributions::{Distribution, Uniform};
 use rand::Rng;
-use rand::distributions::{self, IndependentSample};
-
 
 /// An efficient implementation of roulette wheel selection. This can be
 /// used to simulate a loaded die.
@@ -41,7 +39,7 @@ pub struct Roulette<T> {
     probabilities: Vec<T>,
     alias: Vec<usize>,
     probability: Vec<f64>,
-    range: distributions::Range<usize>,
+    range: Uniform<usize>,
 }
 
 impl<T> Roulette<T> {
@@ -52,14 +50,9 @@ impl<T> Roulette<T> {
     /// Panics if the probabilities are all zero or if any are negative.
     pub fn new(probabilities: Vec<(T, f64)>) -> Roulette<T> {
         let len = probabilities.len();
-        let range = distributions::Range::new(0usize, len);
+        let range = Uniform::from(0..len);
 
-        // .sum() isn't stable right now :(
-        // let sum = probabilities.iter().map(|x| x.1).sum();
-        let mut sum = 0.0;
-        for &(_, prob) in &probabilities {
-            sum += prob;
-        }
+        let sum: f64 = probabilities.iter().map(|x| x.1).sum();
 
         for prob in &probabilities {
             if prob.1 < 0.0 {
@@ -107,19 +100,46 @@ impl<T> Roulette<T> {
 
         Roulette {
             probabilities: probabilities.into_iter().map(|x| x.0).collect(),
-            alias: alias,
-            probability: probability,
-            range: range,
+            alias,
+            probability,
+            range,
         }
     }
 
     /// Returns a random element; each element's chance of being returned
     /// is proportional to the probability specified in the parameter
     /// to `Roulette::new`.
-    // TODO: I don't really like the name `next`
-    pub fn next<R: Rng>(&self, rng: &mut R) -> &T {
-        let column = self.range.ind_sample(rng);
+    pub fn sample<R: Rng>(&self, rng: &mut R) -> &T {
+        let column = self.range.sample(rng);
         let coin = rng.gen::<f64>() < self.probability[column];
         &self.probabilities[if coin { column } else { self.alias[column] }]
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    // TODO: is there a way to test the distribution returned from `sample` in a
+    // deterministic way?
+
+    use super::*;
+
+    #[test]
+    fn most_entries_zero() {
+        let roulette = Roulette::new(vec![('a', 0.0), ('b', 1.0), ('c', 0.0), ('d', 0.0)]);
+        for _ in 0..10 {
+            assert_eq!(&'b', roulette.sample(&mut rand::thread_rng()));
+        }
+    }
+
+    #[test]
+    #[should_panic]
+    fn all_entries_zero() {
+        Roulette::new(vec![('a', 0.0), ('b', 0.0), ('c', 0.0), ('d', 0.0)]);
+    }
+
+    #[test]
+    #[should_panic]
+    fn negative_entry() {
+        Roulette::new(vec![('a', 0.0), ('b', 1.0), ('c', 0.0), ('d', -0.5)]);
     }
 }
