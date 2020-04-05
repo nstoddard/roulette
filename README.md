@@ -1,3 +1,5 @@
+**Note: the `rand` crate now has [built-in-support for the Alias method](https://rust-random.github.io/rand/rand/distributions/weighted/alias_method/index.html), so this library is no longer needed.**
+
 A Rust implementation of roulette wheel selection using the Alias Method.
 This can be used to simulate a loaded die and similar situations.
 
