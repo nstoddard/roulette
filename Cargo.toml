@@ -1,6 +1,6 @@
 [package]
 name = "roulette"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Nathan Stoddard"]
 description = "An efficient implementation of roulette wheel selection"
 license = "MIT"
